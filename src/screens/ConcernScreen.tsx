@@ -6,6 +6,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { useConsult } from '../context/ConsultContext';
 import * as Haptics from 'expo-haptics';
 import { impactAsync, selectionAsync } from '../utils/haptics';
+import { colors } from '../theme/colors';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -59,6 +60,7 @@ export default function ConcernScreen() {
             <TextInput
               style={[styles.input, error ? styles.inputError : null]}
               placeholder="E.g., My 2-year old is refusing to eat..."
+              placeholderTextColor="#999"
               multiline
               textAlignVertical="top"
               value={localConcern}
@@ -120,7 +122,7 @@ export default function ConcernScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.background,
   },
   keyboardView: {
     flex: 1,
@@ -130,20 +132,20 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   progressContainer: {
-    height: 4,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 2,
+    height: 6,
+    backgroundColor: '#E6E6FA',
+    borderRadius: 3,
     marginBottom: 16,
     overflow: 'hidden',
   },
   progressBar: {
     height: '100%',
-    backgroundColor: '#007AFF',
-    borderRadius: 2,
+    backgroundColor: colors.progressStep, // Royal Blue
+    borderRadius: 3,
   },
   stepIndicator: {
     fontSize: 14,
-    color: '#999',
+    color: colors.textSecondary,
     fontWeight: '600',
     marginBottom: 8,
     textTransform: 'uppercase',
@@ -151,12 +153,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
+    color: colors.textPrimary,
     marginBottom: 12,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: colors.textSecondary,
     lineHeight: 24,
     marginBottom: 32,
   },
@@ -164,22 +166,27 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   input: {
-    backgroundColor: '#f9f9f9',
-    borderRadius: 16,
-    padding: 16,
+    backgroundColor: colors.white,
+    borderRadius: 20,
+    padding: 20,
     fontSize: 16,
     minHeight: 140,
-    color: '#333',
+    color: colors.textPrimary,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: 'rgba(0,0,0,0.05)',
     textAlignVertical: 'top',
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   inputError: {
-    borderColor: 'red',
-    backgroundColor: '#fff0f0',
+    borderColor: colors.error,
+    backgroundColor: '#FFF5F5',
   },
   errorText: {
-    color: 'red',
+    color: colors.error,
     fontSize: 14,
     marginTop: 8,
     marginLeft: 4,
@@ -187,7 +194,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: colors.textPrimary,
     marginBottom: 16,
   },
   optionsContainer: {
@@ -199,33 +206,30 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 20,
     paddingHorizontal: 12,
-    borderRadius: 16,
+    borderRadius: 20,
     borderWidth: 2,
-    borderColor: '#f0f0f0',
-    backgroundColor: '#fff',
+    borderColor: 'transparent',
+    backgroundColor: colors.white,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   optionSelected: {
-    borderColor: '#007AFF',
-    backgroundColor: '#eff6ff',
-    shadowColor: "#007AFF",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 4,
+    borderColor: colors.progressStep,
+    backgroundColor: colors.systemBubble,
   },
   optionText: {
     fontSize: 15,
-    fontWeight: '500',
-    color: '#666',
+    fontWeight: '600',
+    color: colors.textSecondary,
     textAlign: 'center',
   },
   optionTextSelected: {
-    color: '#007AFF',
+    color: colors.progressStep,
     fontWeight: '700',
   },
   footer: {
@@ -233,22 +237,19 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   button: {
-    backgroundColor: '#007AFF',
-    borderRadius: 14,
+    backgroundColor: colors.primaryAction, // Salmon
+    borderRadius: 30,
     paddingVertical: 18,
     alignItems: 'center',
-    shadowColor: "#007AFF",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
+    shadowColor: colors.primaryAction,
+    shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowRadius: 12,
+    elevation: 6,
   },
   buttonText: {
-    color: '#fff',
+    color: colors.white,
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
 });

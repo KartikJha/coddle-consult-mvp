@@ -1,20 +1,11 @@
-// import { View, Text } from 'react-native';
-
-// export default function IntroScreen() {
-//   return (
-//     <View>
-//       <Text>Intro Screen</Text>
-//     </View>
-//   );
-// }
-
 import React, { useEffect, useRef } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, SafeAreaView, Animated, LayoutAnimation, Platform, UIManager } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, SafeAreaView, Animated, Platform, UIManager } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import * as Haptics from 'expo-haptics';
 import { impactAsync, selectionAsync } from '../utils/haptics';
+import { theme, colors } from '../theme/colors';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -57,7 +48,7 @@ export default function IntroScreen() {
         <Animated.View style={[styles.header, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
           <Text style={styles.title}>Coddle Consult</Text>
           <Text style={styles.subtitle}>
-            Get expert advice for your parenting concerns, anytime, anywhere.
+            Get expert advice for your parenting concerns, from real clinicians.
           </Text>
         </Animated.View>
 
@@ -71,7 +62,7 @@ export default function IntroScreen() {
             <View style={styles.optionTextContainer}>
               <Text style={styles.optionTitle}>Chat Advice</Text>
               <Text style={styles.optionDesc}>
-                Text with a clinician for quick answers and potential next steps.
+                Text with a clinician for quick answers and reassuring guidance.
               </Text>
             </View>
           </TouchableOpacity>
@@ -91,7 +82,7 @@ export default function IntroScreen() {
 
         <View style={styles.footer}>
           <TouchableOpacity style={styles.button} onPress={handleGetStarted}>
-            <Text style={styles.buttonText}>Get Started</Text>
+            <Text style={styles.buttonText}>Get Started →</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -102,7 +93,7 @@ export default function IntroScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.background, // Cream
   },
   content: {
     padding: 24,
@@ -115,12 +106,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#333',
+    color: colors.textPrimary, // Navy
     marginBottom: 12,
   },
   subtitle: {
     fontSize: 18,
-    color: '#666',
+    color: colors.textSecondary,
     lineHeight: 26,
   },
   section: {
@@ -129,24 +120,29 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333',
+    color: colors.textPrimary,
     marginBottom: 20,
   },
   optionCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f9f9f9',
-    borderRadius: 16,
-    padding: 20,
+    backgroundColor: colors.white,
+    borderRadius: 24, // More rounded
+    padding: 24,
     marginBottom: 16,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 2,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: 'rgba(0,0,0,0.02)',
   },
   iconPlaceholder: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#e6f0ff',
+    backgroundColor: colors.systemBubble, // Lavender
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 16,
@@ -159,28 +155,32 @@ const styles = StyleSheet.create({
   },
   optionTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: '700', // Bolder
+    color: colors.textPrimary,
     marginBottom: 4,
   },
   optionDesc: {
     fontSize: 14,
-    color: '#666',
+    color: colors.textSecondary,
     lineHeight: 20,
   },
   footer: {
     marginTop: 'auto',
   },
   button: {
-    backgroundColor: '#007AFF',
-    borderRadius: 12,
+    backgroundColor: colors.primaryAction, // Salmon
+    borderRadius: 30, // Pill
     paddingVertical: 18,
     alignItems: 'center',
+    shadowColor: colors.primaryAction,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 6,
   },
   buttonText: {
-    color: '#fff',
+    color: colors.white,
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
 });
-

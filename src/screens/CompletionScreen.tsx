@@ -6,6 +6,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { useConsult } from '../context/ConsultContext';
 import * as Haptics from 'expo-haptics';
 import { impactAsync } from '../utils/haptics';
+import { colors } from '../theme/colors';
 
 type CompletionScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Completion'>;
 
@@ -38,8 +39,7 @@ export default function CompletionScreen() {
     impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     reset();
     setSupportType('video');
-    // Navigate to Concern (as step 1) but with video pre-selected contextually, 
-    // or arguably back to Intro. Let's go to Concern to let them re-enter/confirm concern.
+    // Navigate to Concern (as step 1) but with video pre-selected contextually
     navigation.reset({
       index: 0,
       routes: [{ name: 'Intro' }, { name: 'Concern' }],
@@ -87,7 +87,7 @@ export default function CompletionScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -99,24 +99,29 @@ const styles = StyleSheet.create({
   iconContainer: {
     width: 80,
     height: 80,
-    backgroundColor: '#e6f0ff',
+    backgroundColor: '#fff',
     borderRadius: 40,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 24,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   icon: {
     fontSize: 40,
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
-    color: '#333',
+    color: colors.textPrimary,
     marginBottom: 16,
   },
   message: {
     fontSize: 16,
-    color: '#666',
+    color: colors.textSecondary,
     textAlign: 'center',
     marginBottom: 48,
     lineHeight: 24,
@@ -126,37 +131,48 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   primaryButton: {
-    backgroundColor: '#007AFF',
-    borderRadius: 12,
+    backgroundColor: colors.primaryAction,
+    borderRadius: 30,
     paddingVertical: 18,
     alignItems: 'center',
     width: '100%',
+    shadowColor: colors.primaryAction,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 6,
   },
   primaryButtonText: {
     color: '#fff',
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
   secondaryButton: {
     backgroundColor: '#fff',
-    borderRadius: 12,
+    borderRadius: 30,
     paddingVertical: 18,
     alignItems: 'center',
     width: '100%',
-    borderWidth: 1,
-    borderColor: '#007AFF',
+    borderWidth: 2,
+    borderColor: 'transparent', // For sizing match if needed, or specific border color
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
   },
   secondaryButtonText: {
-    color: '#007AFF',
+    color: colors.primaryAction,
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
   textButton: {
     paddingVertical: 16,
     alignItems: 'center',
   },
   textButtonText: {
-    color: '#666',
+    color: colors.textSecondary,
     fontSize: 16,
+    fontWeight: '600',
   }
 });

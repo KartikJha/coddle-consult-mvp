@@ -1,11 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, Alert, SafeAreaView, ScrollView, ActivityIndicator, Animated, Easing } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, Alert, SafeAreaView, ScrollView, ActivityIndicator, Animated } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { useConsult } from '../context/ConsultContext';
 import * as Haptics from 'expo-haptics';
 import { impactAsync, selectionAsync, notificationAsync } from '../utils/haptics';
+import { colors } from '../theme/colors';
 
 type ProviderScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Provider'>;
 
@@ -106,7 +107,7 @@ export default function ProviderScreen() {
         <View style={styles.footer}>
           {loading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#007AFF" />
+              <ActivityIndicator size="large" color={colors.primaryAction} />
               <Text style={styles.loadingText}>{loadingText}</Text>
             </View>
           ) : (
@@ -135,27 +136,27 @@ export default function ProviderScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.background,
   },
   content: {
     padding: 24,
     paddingBottom: 40,
   },
   progressContainer: {
-    height: 4,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 2,
+    height: 6,
+    backgroundColor: '#E6E6FA',
+    borderRadius: 3,
     marginBottom: 16,
     overflow: 'hidden',
   },
   progressBar: {
     height: '100%',
-    backgroundColor: '#007AFF',
-    borderRadius: 2,
+    backgroundColor: colors.progressStep,
+    borderRadius: 3,
   },
   stepIndicator: {
     fontSize: 14,
-    color: '#999',
+    color: colors.textSecondary,
     fontWeight: '600',
     marginBottom: 8,
     textTransform: 'uppercase',
@@ -163,19 +164,28 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
+    color: colors.textPrimary,
     marginBottom: 24,
   },
   providerCard: {
     flexDirection: 'row',
     marginBottom: 32,
-    backgroundColor: '#fff',
+    backgroundColor: colors.white,
+    padding: 20,
+    borderRadius: 20,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.02)',
   },
   avatarPlaceholder: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#e6f0ff',
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: colors.systemBubble,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 16,
@@ -183,7 +193,7 @@ const styles = StyleSheet.create({
   avatarText: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#007AFF',
+    color: colors.textPrimary,
   },
   providerInfo: {
     flex: 1,
@@ -191,33 +201,38 @@ const styles = StyleSheet.create({
   providerName: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#333',
+    color: colors.textPrimary,
     marginBottom: 4,
   },
   providerCreds: {
     fontSize: 14,
-    color: '#007AFF',
+    color: colors.progressStep,
     marginBottom: 8,
     fontWeight: '600',
   },
   providerBio: {
     fontSize: 14,
-    color: '#666',
+    color: colors.textSecondary,
     lineHeight: 20,
   },
   summaryContainer: {
-    backgroundColor: '#f9f9f9',
+    backgroundColor: colors.white,
     padding: 24,
-    borderRadius: 16,
+    borderRadius: 20,
     marginBottom: 32,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: 'rgba(0,0,0,0.02)',
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 1,
   },
   summaryTitle: {
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 12,
-    color: '#333',
+    color: colors.textPrimary,
   },
   summaryRow: {
     flexDirection: 'row',
@@ -226,12 +241,12 @@ const styles = StyleSheet.create({
   },
   summaryLabel: {
     fontSize: 16,
-    color: '#555',
+    color: colors.textSecondary,
   },
   summaryPrice: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: colors.textPrimary,
   },
   checkboxContainer: {
     flexDirection: 'row',
@@ -248,50 +263,45 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 2,
+    backgroundColor: colors.white,
   },
   checkboxChecked: {
-    backgroundColor: '#007AFF',
-    borderColor: '#007AFF',
+    backgroundColor: colors.progressStep,
+    borderColor: colors.progressStep,
   },
   checkmark: {
-    color: '#fff',
+    color: colors.white,
     fontSize: 14,
     fontWeight: 'bold',
   },
   checkboxText: {
     flex: 1,
     fontSize: 14,
-    color: '#666',
+    color: colors.textSecondary,
     lineHeight: 20,
   },
   footer: {
     marginTop: 'auto',
   },
   button: {
-    backgroundColor: '#007AFF',
-    borderRadius: 14,
+    backgroundColor: colors.primaryAction, // Salmon
+    borderRadius: 30, // Pill
     paddingVertical: 18,
     alignItems: 'center',
-    shadowColor: "#007AFF",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
+    shadowColor: colors.primaryAction,
+    shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowRadius: 12,
+    elevation: 6,
   },
   buttonContent: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  buttonDisabled: {
-    backgroundColor: '#ccc',
-  },
   buttonText: {
-    color: '#fff',
+    color: colors.white,
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
   loadingContainer: {
     alignItems: 'center',
@@ -300,7 +310,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#666',
+    color: colors.textSecondary,
     fontWeight: '500',
   },
   secureBadge: {

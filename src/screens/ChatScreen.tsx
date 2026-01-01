@@ -6,6 +6,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { useConsult } from '../context/ConsultContext';
 import * as Haptics from 'expo-haptics';
 import { impactAsync, notificationAsync } from '../utils/haptics';
+import { colors } from '../theme/colors';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -33,16 +34,24 @@ const AnimatedMessage = ({ item }: { item: Message }) => {
 
   const isUser = item.sender === 'user';
   return (
-    <Animated.View style={[
-      styles.messageBubble,
-      isUser ? styles.userBubble : styles.clinicianBubble,
-      { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }
-    ]}>
-      <Text style={[
-        styles.messageText,
-        isUser ? styles.userText : styles.clinicianText
-      ]}>{item.text}</Text>
-    </Animated.View>
+    <View style={styles.messageRow}>
+      {!isUser && (
+        <View style={styles.avatar}>
+          <Text style={styles.avatarText}>C</Text>
+        </View>
+      )}
+      <Animated.View style={[
+        styles.messageBubble,
+        isUser ? styles.userBubble : styles.clinicianBubble,
+        { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }
+      ]}>
+        {!isUser && <Text style={styles.senderName}>Dr. Chen</Text>}
+        <Text style={[
+          styles.messageText,
+          isUser ? styles.userText : styles.clinicianText
+        ]}>{item.text}</Text>
+      </Animated.View>
+    </View>
   );
 };
 
@@ -67,12 +76,14 @@ const TypingIndicator = () => {
 
   return (
     <View style={styles.typingContainer}>
+      <View style={styles.avatar}>
+        <Text style={styles.avatarText}>C</Text>
+      </View>
       <View style={styles.typingBubble}>
         {dots.map((dot, i) => (
           <Animated.View key={i} style={[styles.typingDot, { opacity: dot }]} />
         ))}
       </View>
-      <Text style={styles.typingText}>Dr. Chen is replying...</Text>
     </View>
   )
 }
@@ -162,10 +173,6 @@ export default function ChatScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Consult Session</Text>
-      </View>
-
       <FlatList
         ref={flatListRef}
         data={messages}
@@ -208,10 +215,13 @@ export default function ChatScreen() {
                   value={input}
                   onChangeText={setInput}
                   placeholder="Type your follow-up..."
+                  placeholderTextColor="#999"
                   multiline
                 />
                 <TouchableOpacity onPress={handleSend} disabled={!input.trim()}>
-                  <Text style={[styles.sendText, !input.trim() && styles.sendDisabled]}>Send</Text>
+                  <View style={[styles.sendButton, !input.trim() && styles.sendDisabled]}>
+                    <Text style={styles.sendText}>→</Text>
+                  </View>
                 </TouchableOpacity>
               </View>
             )}
@@ -227,131 +237,167 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-  },
-  header: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    backgroundColor: colors.background,
   },
   listContent: {
     padding: 16,
     paddingBottom: 32,
   },
+  messageRow: {
+    flexDirection: 'row',
+    marginBottom: 16,
+    width: '100%',
+  },
+  avatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.primaryAction, // Salmon avatar for brand
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+    marginTop: 4, // Align top
+  },
+  avatarText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
   messageBubble: {
     maxWidth: '80%',
-    padding: 12,
-    borderRadius: 16,
-    marginBottom: 12,
+    padding: 16,
+    borderRadius: 20,
+    elevation: 1,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
   },
   userBubble: {
     alignSelf: 'flex-end',
-    backgroundColor: '#007AFF',
+    backgroundColor: colors.userBubble, // Mint
     borderBottomRightRadius: 4,
+    marginLeft: 'auto', // Push to right
   },
   clinicianBubble: {
     alignSelf: 'flex-start',
-    backgroundColor: '#F2F2F7',
-    borderBottomLeftRadius: 4,
+    backgroundColor: colors.systemBubble, // Lavender
+    borderTopLeftRadius: 4,
+  },
+  senderName: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.textPrimary,
+    marginBottom: 4,
+    opacity: 0.7,
   },
   messageText: {
     fontSize: 16,
     lineHeight: 22,
   },
   userText: {
-    color: '#fff',
+    color: colors.textPrimary,
   },
   clinicianText: {
-    color: '#000',
+    color: colors.textPrimary,
   },
   typingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingBottom: 16,
+    paddingBottom: 24,
   },
   typingBubble: {
     flexDirection: 'row',
-    backgroundColor: '#F2F2F7',
-    padding: 12,
-    borderRadius: 16,
-    borderBottomLeftRadius: 4,
-    marginRight: 8,
+    backgroundColor: colors.systemBubble,
+    padding: 16,
+    borderRadius: 20,
+    borderTopLeftRadius: 4,
     alignItems: 'center',
-    height: 40,
+    height: 54,
   },
   typingDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#999',
-    marginHorizontal: 3,
-  },
-  typingText: {
-    color: '#999',
-    fontSize: 12,
-    fontStyle: 'italic',
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: colors.textSecondary,
+    marginHorizontal: 4,
   },
   inputContainer: {
     padding: 16,
     borderTopWidth: 1,
-    borderTopColor: '#eee',
-    backgroundColor: '#fff',
+    borderTopColor: colors.border,
+    backgroundColor: colors.background,
   },
   lockedInput: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'rgba(0,0,0,0.03)',
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 24,
     alignItems: 'center',
   },
   lockedText: {
-    color: '#888',
+    color: colors.textSecondary,
     fontStyle: 'italic',
   },
   activeInputRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-end',
     gap: 12,
   },
   input: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    backgroundColor: colors.white,
+    borderRadius: 24,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
     fontSize: 16,
-    maxHeight: 100,
+    maxHeight: 120,
+    borderWidth: 1,
+    borderColor: colors.border,
+    color: colors.textPrimary,
   },
-  sendText: {
-    color: '#007AFF',
-    fontWeight: '600',
-    fontSize: 16,
+  sendButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.primaryAction,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   sendDisabled: {
-    color: '#ccc',
+    backgroundColor: '#ccc',
+  },
+  sendText: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginTop: -2,
   },
   limitText: {
     fontSize: 12,
-    color: '#999',
+    color: colors.textSecondary,
     marginTop: 8,
     textAlign: 'center',
   },
   actionContainer: {
     padding: 24,
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: colors.border,
     alignItems: 'center',
+    backgroundColor: colors.white,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 5,
   },
   completeText: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 16,
-    color: '#333',
+    color: colors.textPrimary,
   },
   actionButtons: {
     flexDirection: 'row',
@@ -359,19 +405,21 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
-    backgroundColor: '#eee',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: colors.primaryAction,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 24,
     alignItems: 'center',
   },
   videoButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: colors.primaryAction,
   },
   actionButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: colors.primaryAction,
   },
   videoButtonText: {
     color: '#fff',
