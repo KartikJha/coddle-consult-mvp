@@ -33,6 +33,7 @@ export default function AppNavigator() {
           },
           contentStyle: { backgroundColor: theme.colors.background },
           animation: 'slide_from_right',
+          headerShown: false, // Default to hidden since we implement custom layouts
         }}
       >
         <Stack.Screen

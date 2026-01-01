@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, Platform, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
-import { colors } from '../theme/colors';
-import { selectionAsync, impactAsync } from '../utils/haptics';
+import { impactAsync, selectionAsync } from '../utils/haptics';
 import * as Haptics from 'expo-haptics';
+import MainLayout from '../components/MainLayout';
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -18,7 +18,7 @@ export default function HomeScreen() {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+        <MainLayout variant="main">
             <ScrollView contentContainerStyle={styles.content}>
                 {/* Insight Card */}
                 <View style={styles.insightCard}>
@@ -32,17 +32,14 @@ export default function HomeScreen() {
                     </Text>
                 </View>
 
-                {/* Spacer to push content down roughly as per screenshot */}
                 <View style={{ height: 100 }} />
 
-                {/* See Previous Messages Button */}
                 <TouchableOpacity style={styles.previousMessagesButton} onPress={selectionAsync} activeOpacity={0.7}>
                     <Text style={styles.previousMessagesText}>See previous messages</Text>
                 </TouchableOpacity>
 
                 <View style={{ flex: 1 }} />
 
-                {/* Chips */}
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipsContainer} contentContainerStyle={styles.chipsContent}>
                     <TouchableOpacity style={[styles.chip, { backgroundColor: '#FFE8D1' }]} activeOpacity={0.8}>
                         <Text style={styles.chipText}>Daily routine tips?</Text>
@@ -52,7 +49,6 @@ export default function HomeScreen() {
                     </TouchableOpacity>
                 </ScrollView>
 
-                {/* Fake Input */}
                 <View style={styles.fakeInputContainer}>
                     <Text style={styles.fakeInputText}>Ask me anything or log baby's day...</Text>
                     <View style={styles.sendIcon}>
@@ -60,13 +56,11 @@ export default function HomeScreen() {
                     </View>
                 </View>
 
-                {/* Disclaimer */}
                 <Text style={styles.disclaimer}>
                     Coddle's smart, but not perfect. Always consult with your doctor.
                 </Text>
             </ScrollView>
 
-            {/* Floating Chat Bubble */}
             <TouchableOpacity
                 style={styles.fab}
                 onPress={handleConsultPress}
@@ -74,38 +68,14 @@ export default function HomeScreen() {
             >
                 <Text style={styles.fabIcon}>💬</Text>
             </TouchableOpacity>
-
-            {/* Bottom Navigation (Static) */}
-            <View style={styles.bottomNav}>
-                <NavItem icon="🏠" label="Home" active />
-                <NavItem icon="🤖" label="AI Assistant" />
-                <NavItem icon="📅" label="History" />
-                <NavItem icon="📊" label="Insights" />
-                <NavItem icon="⚙️" label="Settings" />
-                <NavItem icon="👶" label="Child" />
-            </View>
-        </SafeAreaView>
+        </MainLayout>
     );
 }
 
-const NavItem = ({ icon, label, active = false }: { icon: string, label: string, active?: boolean }) => (
-    <View style={styles.navItem}>
-        <View style={[styles.navIconContainer, active && styles.navIconActive]}>
-            <Text style={[styles.navIcon, active && { color: 'white' }]}>{icon}</Text>
-        </View>
-        <Text style={[styles.navLabel, active && styles.navLabelActive]}>{label}</Text>
-    </View>
-);
-
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
     content: {
         flexGrow: 1,
         padding: 16,
-        paddingBottom: 100, // Space for Bottom Nav
     },
     insightCard: {
         backgroundColor: '#E8F1FA', // Light blue
@@ -201,15 +171,15 @@ const styles = StyleSheet.create({
     },
     fab: {
         position: 'absolute',
-        bottom: 90, // Above bottom nav
+        bottom: 24,
         right: 20,
         width: 56,
         height: 56,
         borderRadius: 28,
-        backgroundColor: colors.primaryAction,
+        backgroundColor: '#F56565',
         alignItems: 'center',
         justifyContent: 'center',
-        shadowColor: colors.primaryAction,
+        shadowColor: '#F56565',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
@@ -218,50 +188,5 @@ const styles = StyleSheet.create({
     },
     fabIcon: {
         fontSize: 24,
-    },
-    bottomNav: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: 80,
-        backgroundColor: 'white',
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        paddingTop: 12,
-        paddingBottom: Platform.OS === 'ios' ? 24 : 12,
-        borderTopWidth: 1,
-        borderTopColor: '#F7FAFC',
-        shadowColor: 'black',
-        shadowOffset: { width: 0, height: -2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-        elevation: 10,
-    },
-    navItem: {
-        alignItems: 'center',
-    },
-    navIconContainer: {
-        width: 32,
-        height: 32,
-        marginBottom: 4,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 10,
-    },
-    navIcon: {
-        fontSize: 20,
-        color: '#718096',
-    },
-    navIconActive: {
-        backgroundColor: '#2A2A5B',
-    },
-    navLabel: {
-        fontSize: 10,
-        color: '#718096',
-    },
-    navLabelActive: {
-        color: '#2A2A5B',
-        fontWeight: 'bold',
     },
 });

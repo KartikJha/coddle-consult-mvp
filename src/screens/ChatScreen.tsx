@@ -7,6 +7,7 @@ import { useConsult } from '../context/ConsultContext';
 import * as Haptics from 'expo-haptics';
 import { impactAsync, notificationAsync } from '../utils/haptics';
 import { colors } from '../theme/colors';
+import MainLayout from '../components/MainLayout';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -172,7 +173,7 @@ export default function ChatScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <MainLayout variant="main" showBack={false}>
       <FlatList
         ref={flatListRef}
         data={messages}
@@ -230,7 +231,7 @@ export default function ChatScreen() {
           </View>
         </KeyboardAvoidingView>
       )}
-    </SafeAreaView>
+    </MainLayout>
   );
 }
 

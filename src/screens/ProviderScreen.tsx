@@ -7,6 +7,7 @@ import { useConsult } from '../context/ConsultContext';
 import * as Haptics from 'expo-haptics';
 import { impactAsync, selectionAsync, notificationAsync } from '../utils/haptics';
 import { colors } from '../theme/colors';
+import MainLayout from '../components/MainLayout';
 
 type ProviderScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Provider'>;
 
@@ -59,8 +60,12 @@ export default function ProviderScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <MainLayout variant="main" showBack={false}>
       <ScrollView contentContainerStyle={styles.content}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginBottom: 10 }}>
+          <Text style={{ fontSize: 16, color: colors.textSecondary }}>← Back</Text>
+        </TouchableOpacity>
+
         {/* Progress Bar */}
         <View style={styles.progressContainer}>
           <View style={[styles.progressBar, { width: '66%' }]} />
@@ -129,7 +134,7 @@ export default function ProviderScreen() {
           )}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </MainLayout>
   );
 }
 

@@ -7,6 +7,7 @@ import { useConsult } from '../context/ConsultContext';
 import * as Haptics from 'expo-haptics';
 import { impactAsync, selectionAsync } from '../utils/haptics';
 import { colors } from '../theme/colors';
+import MainLayout from '../components/MainLayout';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -39,12 +40,16 @@ export default function ConcernScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <MainLayout variant="main" showBack={false}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
       >
         <ScrollView contentContainerStyle={styles.content}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginBottom: 10 }}>
+            <Text style={{ fontSize: 16, color: colors.textSecondary }}>← Back</Text>
+          </TouchableOpacity>
+
           {/* Progress Bar */}
           <View style={styles.progressContainer}>
             <View style={[styles.progressBar, { width: '33%' }]} />
@@ -115,7 +120,7 @@ export default function ConcernScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </MainLayout>
   );
 }
 
