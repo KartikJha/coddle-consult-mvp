@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import HomeScreen from '../screens/HomeScreen';
 import IntroScreen from '../screens/IntroScreen';
 import ConcernScreen from '../screens/ConcernScreen';
 import ProviderScreen from '../screens/ProviderScreen';
@@ -10,6 +11,7 @@ import CustomHeader from '../components/CustomHeader';
 import { theme } from '../theme/colors';
 
 export type RootStackParamList = {
+  Home: undefined;
   Intro: undefined;
   Concern: undefined;
   Provider: undefined;
@@ -33,6 +35,13 @@ export default function AppNavigator() {
           animation: 'slide_from_right',
         }}
       >
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{
+            header: () => <CustomHeader variant="main" showBack={false} />,
+          }}
+        />
         <Stack.Screen
           name="Intro"
           component={IntroScreen}
