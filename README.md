@@ -1,6 +1,6 @@
 # Coddle Consult Expert MVP
 
-This project is a React Native (Expo) implementation of the Coddle "Consult Expert" feature MVP. It demonstrates a multi-step user flow, mock payment logic, and a simulated chat state machine.
+This project is a React Native (Expo) implementation of the Coddle "Consult Expert" feature MVP. It demonstrates a multi-step user flow, mock payment logic, and a simulated chat state machine, enhanced with delightful UX patterns.
 
 ## Setup
 
@@ -12,30 +12,25 @@ This project is a React Native (Expo) implementation of the Coddle "Consult Expe
     ```bash
     npx expo start
     ```
-    -   Press `i` to open in iOS Simulator (if on macOS).
-    -   Press `a` to open in Android Emulator.
-    -   Scan the QR code with Expo Go on a physical device.
 
-## Architecture
+## Architecture & UX
 
-*   **Navigation**: `react-navigation` (Native Stack) handles the flow between screens (`Intro` -> `Concern` -> `Provider` -> `Chat` -> `Completion`).
-*   **State Management**: React Context (`ConsultContext`) is used to persist the user's `concern` text and `supportType` (chat vs video) across screens. This avoids prop drilling and allows easy resetting of the flow.
-*   **Chat Logic**: The `ChatScreen` implements a 4-state machine to simulate a live consult:
-    1.  `initial_wait`: User waits for the clinician to review text.
-    2.  `unlocked`: Clinician replies, user can type a follow-up.
-    3.  `second_wait`: User sends follow-up, waits for final advice.
-    4.  `complete`: Final advice received, session ends.
+*   **Navigation**: `react-navigation` handles the screen stack `Intro` -> `Concern` -> `Provider` -> `Chat` -> `Completion`.
+*   **State**: `ConsultContext` persist user choices.
+*   **Animations**:
+    -   `Animated` API for entrance, scale, and fade effects.
+    -   `LayoutAnimation` for smooth UI layout changes (error messages, input state).
+*   **Haptics**: `expo-haptics` provides tactile feedback for interactions (wrapped safely for web/simulator).
 
-## Design Decisions & Trade-offs
+## Key Features
 
-*   **Mock Functionality**: Payment and Clinician replies are mocked with `setTimeout` to simulate network/processing delays without a real backend.
-*   **Styling**: Used `StyleSheet` for standard, performance-friendly React Native styling. Used a clean, flat aesthetic consistent with medical/parenting apps.
-*   **Video Flow**: For the MVP, the "Video Consult" path routes to the Completion screen (simulating a confirmed booking) or could be easily extended to a "Waiting Room" screen.
-*   **Component Structure**: Screens are kept self-contained. Reusable UI components (like Buttons/Cards) could be extracted further for a larger app, but are inline or minimal here for MVP speed and clarity.
+-   **Mock Payment**: Simulated secure payment flow with locking animation and status text.
+-   **Chat Simulation**: 4-state machine with realistic typing indicators and message entrance animations.
+-   **Interactive UI**: Cards and buttons respond to touch with scale animations and haptics.
+-   **Progress Tracking**: Visual progress bar on multi-step forms.
 
 ## Future Improvements
 
 *   **Real Backend**: Connect to a socket/API for real-time chat.
-*   **Persistence**: Use `AsyncStorage` to save chat history if the app is closed.
-*   **Validation**: Add more robust form validation and error handling.
-*   **Animations**: Add `LayoutAnimation` or `Reanimated` for smoother transitions between chat states.
+*   **Persistence**: Use `AsyncStorage` to save chat history.
+*   **Dark Mode**: Add full dark mode support.

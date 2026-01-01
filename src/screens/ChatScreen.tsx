@@ -1,9 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, FlatList, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, FlatList, KeyboardAvoidingView, Platform, Animated, LayoutAnimation, UIManager } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { useConsult } from '../context/ConsultContext';
+import * as Haptics from 'expo-haptics';
+import { impactAsync, notificationAsync } from '../utils/haptics';
+
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 type ChatScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Chat'>;
 
@@ -12,6 +18,64 @@ type Message = {
   text: string;
   sender: 'user' | 'system' | 'clinician';
 };
+
+// Animated Message Component
+const AnimatedMessage = ({ item }: { item: Message }) => {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(10)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
+      Animated.timing(slideAnim, { toValue: 0, duration: 400, useNativeDriver: true }),
+    ]).start();
+  }, []);
+
+  const isUser = item.sender === 'user';
+  return (
+    <Animated.View style={[
+      styles.messageBubble,
+      isUser ? styles.userBubble : styles.clinicianBubble,
+      { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }
+    ]}>
+      <Text style={[
+        styles.messageText,
+        isUser ? styles.userText : styles.clinicianText
+      ]}>{item.text}</Text>
+    </Animated.View>
+  );
+};
+
+// Typing Indicator Component
+const TypingIndicator = () => {
+  const [dots] = useState([new Animated.Value(0), new Animated.Value(0), new Animated.Value(0)]);
+
+  useEffect(() => {
+    const animations = dots.map((dot, index) => {
+      return Animated.sequence([
+        Animated.delay(index * 200),
+        Animated.loop(
+          Animated.sequence([
+            Animated.timing(dot, { toValue: 1, duration: 400, useNativeDriver: true }),
+            Animated.timing(dot, { toValue: 0, duration: 400, useNativeDriver: true }),
+          ])
+        )
+      ]);
+    });
+    Animated.parallel(animations).start();
+  }, []);
+
+  return (
+    <View style={styles.typingContainer}>
+      <View style={styles.typingBubble}>
+        {dots.map((dot, i) => (
+          <Animated.View key={i} style={[styles.typingDot, { opacity: dot }]} />
+        ))}
+      </View>
+      <Text style={styles.typingText}>Dr. Chen is replying...</Text>
+    </View>
+  )
+}
 
 export default function ChatScreen() {
   const navigation = useNavigation<ChatScreenNavigationProp>();
@@ -24,13 +88,12 @@ export default function ChatScreen() {
   const flatListRef = useRef<FlatList>(null);
 
   useEffect(() => {
-    // Initial Load: Show User's concern as their first message
+    // Initial Load
     const initialMessages: Message[] = [
       { id: '1', text: concern, sender: 'user' }
     ];
     setMessages(initialMessages);
 
-    // Start waiting for clinician reply
     setChatState('initial_wait');
     setIsTyping(true);
 
@@ -40,10 +103,13 @@ export default function ChatScreen() {
         text: "Hi there. I understand this is stressful. Based on what you've shared, it sounds like typical regression. Have there been any recent changes in the household?",
         sender: 'clinician'
       };
+      notificationAsync(Haptics.NotificationFeedbackType.Success);
       setMessages(prev => [...prev, reply]);
       setIsTyping(false);
+
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       setChatState('unlocked');
-    }, 4000); // 4s delay
+    }, 4000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -51,6 +117,7 @@ export default function ChatScreen() {
   const handleSend = () => {
     if (!input.trim()) return;
 
+    impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const newMessage: Message = {
       id: Date.now().toString(),
       text: input,
@@ -59,6 +126,8 @@ export default function ChatScreen() {
 
     setMessages(prev => [...prev, newMessage]);
     setInput('');
+
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setChatState('second_wait');
     setIsTyping(true);
 
@@ -69,32 +138,25 @@ export default function ChatScreen() {
         text: "Thanks for sharing that. It does confirm my suspicion. I recommend sticking to a consistent routine for 3 days. If it persists, let's do a video check-in.",
         sender: 'clinician'
       };
+      notificationAsync(Haptics.NotificationFeedbackType.Success);
       setMessages(prev => [...prev, finalReply]);
       setIsTyping(false);
+
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       setChatState('complete');
-    }, 3000); // 3s delay
+    }, 3000);
   };
 
   const renderItem = ({ item }: { item: Message }) => {
-    const isUser = item.sender === 'user';
-    return (
-      <View style={[
-        styles.messageBubble,
-        isUser ? styles.userBubble : styles.clinicianBubble
-      ]}>
-        <Text style={[
-          styles.messageText,
-          isUser ? styles.userText : styles.clinicianText
-        ]}>{item.text}</Text>
-      </View>
-    );
+    return <AnimatedMessage item={item} />;
   };
 
   const handleComplete = (action: 'new' | 'video') => {
+    impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     if (action === 'new') {
-      navigation.navigate('Completion'); // Or handle reset directly via context in completion
+      navigation.navigate('Completion');
     } else {
-      navigation.navigate('Completion'); // Could pass params to pre-select video
+      navigation.navigate('Completion');
     }
   };
 
@@ -113,12 +175,7 @@ export default function ChatScreen() {
         onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
       />
 
-      {isTyping && (
-        <View style={styles.typingIndicator}>
-          <ActivityIndicator size="small" color="#666" />
-          <Text style={styles.typingText}>Dr. Chen is replying...</Text>
-        </View>
-      )}
+      {isTyping && <TypingIndicator />}
 
       {chatState === 'complete' ? (
         <View style={styles.actionContainer}>
@@ -212,15 +269,33 @@ const styles = StyleSheet.create({
   clinicianText: {
     color: '#000',
   },
-  typingIndicator: {
+  typingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    gap: 8,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+  },
+  typingBubble: {
+    flexDirection: 'row',
+    backgroundColor: '#F2F2F7',
+    padding: 12,
+    borderRadius: 16,
+    borderBottomLeftRadius: 4,
+    marginRight: 8,
+    alignItems: 'center',
+    height: 40,
+  },
+  typingDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#999',
+    marginHorizontal: 3,
   },
   typingText: {
-    color: '#666',
-    fontSize: 14,
+    color: '#999',
+    fontSize: 12,
+    fontStyle: 'italic',
   },
   inputContainer: {
     padding: 16,

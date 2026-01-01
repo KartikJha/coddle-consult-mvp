@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, Alert, SafeAreaView, ScrollView, ActivityIndicator } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Alert, SafeAreaView, ScrollView, ActivityIndicator, Animated, Easing } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { useConsult } from '../context/ConsultContext';
+import * as Haptics from 'expo-haptics';
+import { impactAsync, selectionAsync, notificationAsync } from '../utils/haptics';
 
 type ProviderScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Provider'>;
 
@@ -12,33 +14,56 @@ export default function ProviderScreen() {
   const { supportType } = useConsult();
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState('');
+
+  // Animation for Lock Icon
+  const lockScale = useRef(new Animated.Value(1)).current;
 
   const handlePay = () => {
     if (!agreed) {
+      notificationAsync(Haptics.NotificationFeedbackType.Error);
       Alert.alert('Required', 'Please acknowledge the consent form to proceed.');
       return;
     }
 
+    impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     setLoading(true);
-    // Mock payment delay
+    setLoadingText('Securing payment...');
+
+    // Animate Lock
+    Animated.sequence([
+      Animated.timing(lockScale, { toValue: 1.2, duration: 150, useNativeDriver: true }),
+      Animated.timing(lockScale, { toValue: 1, duration: 150, useNativeDriver: true }),
+    ]).start();
+
+    // Mock steps
+    setTimeout(() => {
+      setLoadingText('Confirming provider...');
+    }, 1500);
+
     setTimeout(() => {
       setLoading(false);
+      notificationAsync(Haptics.NotificationFeedbackType.Success);
       if (supportType === 'chat') {
         navigation.navigate('Chat');
       } else {
-        // Bonus: could go to a Video waiting room or similar.
-        // For MVP core requirements, we can re-use completion or just alert.
-        // Let's implement a simple alert for now or route to completion if strictly following core.
-        // The plan mentioned "Chat (if chat selected) or Completion/VideoStub".
-        // Let's go to Completion for Video for now as a "Booking Confirmed" state.
         navigation.navigate('Completion');
       }
-    }, 2000);
+    }, 3000);
   };
+
+  const toggleAgree = () => {
+    selectionAsync();
+    setAgreed(!agreed);
+  }
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
+        {/* Progress Bar */}
+        <View style={styles.progressContainer}>
+          <View style={[styles.progressBar, { width: '66%' }]} />
+        </View>
         <Text style={styles.stepIndicator}>Step 2 of 3</Text>
         <Text style={styles.title}>Your Expert</Text>
 
@@ -66,8 +91,9 @@ export default function ProviderScreen() {
         </View>
 
         <TouchableOpacity
+          activeOpacity={0.8}
           style={styles.checkboxContainer}
-          onPress={() => setAgreed(!agreed)}
+          onPress={toggleAgree}
         >
           <View style={[styles.checkbox, agreed && styles.checkboxChecked]}>
             {agreed && <Text style={styles.checkmark}>✓</Text>}
@@ -78,17 +104,28 @@ export default function ProviderScreen() {
         </TouchableOpacity>
 
         <View style={styles.footer}>
-          <TouchableOpacity
-            style={[styles.button, loading && styles.buttonDisabled]}
-            onPress={handlePay}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>Confirm & Pay $20.00</Text>
-            )}
-          </TouchableOpacity>
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#007AFF" />
+              <Text style={styles.loadingText}>{loadingText}</Text>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handlePay}
+            >
+              <View style={styles.buttonContent}>
+                <Animated.Text style={{ fontSize: 20, marginRight: 8, transform: [{ scale: lockScale }] }}>🔒</Animated.Text>
+                <Text style={styles.buttonText}>Confirm & Pay $20.00</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+
+          {!loading && (
+            <View style={styles.secureBadge}>
+              <Text style={styles.secureText}>SSL Secure Payment</Text>
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -103,6 +140,18 @@ const styles = StyleSheet.create({
   content: {
     padding: 24,
     paddingBottom: 40,
+  },
+  progressContainer: {
+    height: 4,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 2,
+    marginBottom: 16,
+    overflow: 'hidden',
+  },
+  progressBar: {
+    height: '100%',
+    backgroundColor: '#007AFF',
+    borderRadius: 2,
   },
   stepIndicator: {
     fontSize: 14,
@@ -158,9 +207,11 @@ const styles = StyleSheet.create({
   },
   summaryContainer: {
     backgroundColor: '#f9f9f9',
-    padding: 20,
-    borderRadius: 12,
+    padding: 24,
+    borderRadius: 16,
     marginBottom: 32,
+    borderWidth: 1,
+    borderColor: '#eee',
   },
   summaryTitle: {
     fontSize: 16,
@@ -218,8 +269,20 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#007AFF',
-    borderRadius: 12,
+    borderRadius: 14,
     paddingVertical: 18,
+    alignItems: 'center',
+    shadowColor: "#007AFF",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  buttonContent: {
+    flexDirection: 'row',
     alignItems: 'center',
   },
   buttonDisabled: {
@@ -229,5 +292,25 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: '600',
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#666',
+    fontWeight: '500',
+  },
+  secureBadge: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 16,
+  },
+  secureText: {
+    fontSize: 12,
+    color: '#999',
+    fontWeight: '500',
   },
 });

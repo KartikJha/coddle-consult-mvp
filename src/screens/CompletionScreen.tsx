@@ -1,9 +1,11 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Image } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Image, Animated } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { useConsult } from '../context/ConsultContext';
+import * as Haptics from 'expo-haptics';
+import { impactAsync } from '../utils/haptics';
 
 type CompletionScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Completion'>;
 
@@ -11,11 +13,20 @@ export default function CompletionScreen() {
   const navigation = useNavigation<CompletionScreenNavigationProp>();
   const { reset, setSupportType } = useConsult();
 
+  // Animation
+  const scaleAnim = useRef(new Animated.Value(0)).current;
+
   useEffect(() => {
-    // Optional: could auto-reset context or do cleanup here
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      friction: 6,
+      tension: 40,
+      useNativeDriver: true,
+    }).start();
   }, []);
 
   const handleNewChat = () => {
+    impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     reset();
     navigation.reset({
       index: 0,
@@ -24,6 +35,7 @@ export default function CompletionScreen() {
   };
 
   const handleBookVideo = () => {
+    impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     reset();
     setSupportType('video');
     // Navigate to Concern (as step 1) but with video pre-selected contextually, 
@@ -35,6 +47,7 @@ export default function CompletionScreen() {
   };
 
   const handleHome = () => {
+    impactAsync(Haptics.ImpactFeedbackStyle.Light);
     reset();
     navigation.reset({
       index: 0,
@@ -45,9 +58,9 @@ export default function CompletionScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <View style={styles.iconContainer}>
+        <Animated.View style={[styles.iconContainer, { transform: [{ scale: scaleAnim }] }]}>
           <Text style={styles.icon}>🎉</Text>
-        </View>
+        </Animated.View>
         <Text style={styles.title}>All Set!</Text>
         <Text style={styles.message}>
           Thank you for using Coddle Consult. We hope the advice was helpful.

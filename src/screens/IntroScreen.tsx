@@ -8,35 +8,63 @@
 //   );
 // }
 
-import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, SafeAreaView, Animated, LayoutAnimation, Platform, UIManager } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import * as Haptics from 'expo-haptics';
+import { impactAsync, selectionAsync } from '../utils/haptics';
+
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 type IntroScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Intro'>;
 
 export default function IntroScreen() {
   const navigation = useNavigation<IntroScreenNavigationProp>();
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
 
   const handleGetStarted = () => {
+    impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     navigation.navigate('Concern');
+  };
+
+  const handleCardPress = () => {
+    selectionAsync();
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.header}>
+        <Animated.View style={[styles.header, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
           <Text style={styles.title}>Coddle Consult</Text>
           <Text style={styles.subtitle}>
             Get expert advice for your parenting concerns, anytime, anywhere.
           </Text>
-        </View>
+        </Animated.View>
 
-        <View style={styles.section}>
+        <Animated.View style={[styles.section, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
           <Text style={styles.sectionTitle}>How we can help</Text>
-          
-          <View style={styles.optionCard}>
+
+          <TouchableOpacity activeOpacity={0.7} onPress={handleCardPress} style={styles.optionCard}>
             <View style={styles.iconPlaceholder}>
               <Text style={styles.iconText}>💬</Text>
             </View>
@@ -46,9 +74,9 @@ export default function IntroScreen() {
                 Text with a clinician for quick answers and potential next steps.
               </Text>
             </View>
-          </View>
+          </TouchableOpacity>
 
-          <View style={styles.optionCard}>
+          <TouchableOpacity activeOpacity={0.7} onPress={handleCardPress} style={styles.optionCard}>
             <View style={styles.iconPlaceholder}>
               <Text style={styles.iconText}>📹</Text>
             </View>
@@ -58,8 +86,8 @@ export default function IntroScreen() {
                 Book a face-to-face video session for in-depth support.
               </Text>
             </View>
-          </View>
-        </View>
+          </TouchableOpacity>
+        </Animated.View>
 
         <View style={styles.footer}>
           <TouchableOpacity style={styles.button} onPress={handleGetStarted}>
