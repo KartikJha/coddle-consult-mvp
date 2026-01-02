@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, FlatList, KeyboardAvoidingView, Platform, Animated, LayoutAnimation, UIManager } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, FlatList, KeyboardAvoidingView, Platform, Animated, LayoutAnimation, UIManager, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
@@ -91,13 +91,16 @@ const TypingIndicator = () => {
 
 export default function ChatScreen() {
   const navigation = useNavigation<ChatScreenNavigationProp>();
-  const { concern, setSupportType } = useConsult();
+  const { concern, setSupportType, addToHistory } = useConsult();
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [chatState, setChatState] = useState<'initial_wait' | 'unlocked' | 'second_wait' | 'complete'>('initial_wait');
   const [isTyping, setIsTyping] = useState(false);
   const flatListRef = useRef<FlatList>(null);
+
+  // Ref to track if current session is saved to avoid duplicates if re-rendering or multiple completion triggers
+  const sessionSaved = useRef(false);
 
   useEffect(() => {
     // Initial Load
@@ -151,11 +154,23 @@ export default function ChatScreen() {
         sender: 'clinician'
       };
       notificationAsync(Haptics.NotificationFeedbackType.Success);
-      setMessages(prev => [...prev, finalReply]);
+
+      const completedMessages = [...messages, newMessage, finalReply];
+      setMessages(completedMessages);
       setIsTyping(false);
 
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       setChatState('complete');
+
+      // Save to history
+      if (!sessionSaved.current) {
+        addToHistory({
+          id: Date.now().toString(),
+          date: new Date().toLocaleDateString(),
+          messages: completedMessages
+        });
+        sessionSaved.current = true;
+      }
     }, 3000);
   };
 
@@ -174,6 +189,25 @@ export default function ChatScreen() {
       navigation.navigate('Provider');
     }
   };
+
+  const renderHistoryItem = ({ item }: { item: any }) => (
+    <View style={styles.historyCard}>
+      <Text style={styles.historyDate}>{item.date}</Text>
+      {item.messages.map((msg: Message) => (
+        <View key={msg.id} style={[
+          styles.historyMessageRow,
+          msg.sender === 'user' ? { justifyContent: 'flex-end' } : { justifyContent: 'flex-start' }
+        ]}>
+          <View style={[
+            styles.historyBubble,
+            msg.sender === 'user' ? styles.userBubble : styles.clinicianBubble
+          ]}>
+            <Text style={styles.historyText}>{msg.text}</Text>
+          </View>
+        </View>
+      ))}
+    </View>
+  );
 
   return (
     <MainLayout variant="main" showBack={false}>
@@ -427,5 +461,98 @@ const styles = StyleSheet.create({
   },
   videoButtonText: {
     color: '#fff',
+  },
+  headerActions: {
+    alignItems: 'center',
+    paddingVertical: 8,
+    backgroundColor: colors.background,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  historyButton: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.border,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  historyButtonText: {
+    color: colors.primaryAction,
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: colors.textPrimary,
+  },
+  closeButton: {
+    padding: 8,
+  },
+  closeButtonText: {
+    color: colors.primaryAction,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  emptyHistory: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyHistoryText: {
+    color: colors.textSecondary,
+    fontSize: 16,
+  },
+  historyList: {
+    padding: 16,
+  },
+  historyCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  historyDate: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginBottom: 12,
+    fontWeight: '600',
+  },
+  historyMessageRow: {
+    flexDirection: 'row',
+    marginBottom: 8,
+  },
+  historyBubble: {
+    maxWidth: '85%',
+    padding: 10,
+    borderRadius: 12,
+  },
+  historyText: {
+    fontSize: 14,
+    color: colors.textPrimary,
   },
 });

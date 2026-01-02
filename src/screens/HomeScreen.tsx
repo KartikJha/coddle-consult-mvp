@@ -14,7 +14,7 @@ export default function HomeScreen() {
 
     const handleConsultPress = () => {
         impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-        navigation.navigate('Concern');
+        navigation.navigate('Intro');
     };
 
     return (
@@ -34,9 +34,7 @@ export default function HomeScreen() {
 
                 <View style={{ height: 100 }} />
 
-                <TouchableOpacity style={styles.previousMessagesButton} onPress={selectionAsync} activeOpacity={0.7}>
-                    <Text style={styles.previousMessagesText}>See previous messages</Text>
-                </TouchableOpacity>
+                <View style={{ height: 100 }} />
 
                 <View style={{ flex: 1 }} />
 
