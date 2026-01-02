@@ -91,7 +91,7 @@ const TypingIndicator = () => {
 
 export default function ChatScreen() {
   const navigation = useNavigation<ChatScreenNavigationProp>();
-  const { concern } = useConsult();
+  const { concern, setSupportType } = useConsult();
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -168,7 +168,10 @@ export default function ChatScreen() {
     if (action === 'new') {
       navigation.navigate('Completion');
     } else {
-      navigation.navigate('Completion');
+      // Set support type to video and navigate to Provider (Step 2)
+      // The concern (Step 1 input) remains in context
+      setSupportType('video');
+      navigation.navigate('Provider');
     }
   };
 

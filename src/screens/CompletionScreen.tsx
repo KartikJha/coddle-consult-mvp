@@ -7,6 +7,7 @@ import { useConsult } from '../context/ConsultContext';
 import * as Haptics from 'expo-haptics';
 import { impactAsync } from '../utils/haptics';
 import { colors } from '../theme/colors';
+import MainLayout from '../components/MainLayout';
 
 type CompletionScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Completion'>;
 
@@ -49,14 +50,11 @@ export default function CompletionScreen() {
   const handleHome = () => {
     impactAsync(Haptics.ImpactFeedbackStyle.Light);
     reset();
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Intro' }],
-    });
+    navigation.navigate('Home');
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <MainLayout variant="main" showBack={false}>
       <View style={styles.content}>
         <Animated.View style={[styles.iconContainer, { transform: [{ scale: scaleAnim }] }]}>
           <Text style={styles.icon}>🎉</Text>
@@ -80,7 +78,7 @@ export default function CompletionScreen() {
           </TouchableOpacity>
         </View>
       </View>
-    </SafeAreaView>
+    </MainLayout>
   );
 }
 
