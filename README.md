@@ -15,15 +15,21 @@ This project is a React Native (Expo) implementation of the Coddle "Consult Expe
 
 ## Architecture & UX
 
-*   **Navigation**: `react-navigation` handles the screen stack `Intro` -> `Concern` -> `Provider` -> `Chat` -> `Completion`.
-*   **State**: `ConsultContext` persist user choices.
+*   **Global Layout**: `MainLayout` provides a consistent header (with child profile) and bottom navigation (persistent across screens).
+*   **Navigation**:
+    *   `react-navigation` handles the screen stack `Home` -> `Intro` -> `Concern` -> `Provider` -> `Chat` -> `Completion`.
+    *   `Home` is the entry point, featuring a "Consult" FAB.
+    *   `Intro` serves as the gateway to the consult flow and access to chat history.
+*   **State**: `ConsultContext` persists user choices and `chatHistory`.
 *   **Animations**:
-    -   `Animated` API for entrance, scale, and fade effects.
-    -   `LayoutAnimation` for smooth UI layout changes (error messages, input state).
-*   **Haptics**: `expo-haptics` provides tactile feedback for interactions (wrapped safely for web/simulator).
+    *   `Animated` API for entrance, scale, and fade effects.
+    *   `LayoutAnimation` for smooth UI layout changes (error messages, input state).
+*   **Haptics**: `expo-haptics` provides tactile feedback for interactions.
 
 ## Key Features
 
+-   **Global Navigation**: Enhanced navigation with a persistent bottom bar and a custom header across the consult flow.
+-   **Chat History**: View the last 5 completed chat sessions in a read-only modal (accessible from `Intro` screen).
 -   **Mock Payment**: Simulated secure payment flow with locking animation and status text.
 -   **Chat Simulation**: 4-state machine with realistic typing indicators and message entrance animations.
 -   **Interactive UI**: Cards and buttons respond to touch with scale animations and haptics.
@@ -32,5 +38,5 @@ This project is a React Native (Expo) implementation of the Coddle "Consult Expe
 ## Future Improvements
 
 *   **Real Backend**: Connect to a socket/API for real-time chat.
-*   **Persistence**: Use `AsyncStorage` to save chat history.
+*   **Persistence**: Use `AsyncStorage` to save chat history permanently.
 *   **Dark Mode**: Add full dark mode support.

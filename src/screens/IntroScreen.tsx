@@ -104,27 +104,31 @@ export default function IntroScreen() {
         </View>
       </Modal>
 
-      <ScrollView contentContainerStyle={styles.content}>
-        <Animated.View style={[styles.header, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
-          <Text style={styles.title}>Coddle Consult</Text>
-          <Text style={styles.subtitle}>
-            Get expert advice for your parenting concerns, from real clinicians.
-          </Text>
-        </Animated.View>
+      <View style={styles.wrapper}>
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
+          <Animated.View style={[styles.header, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
+            <Text style={styles.title}>Coddle Consult</Text>
+            <Text style={styles.subtitle}>
+              Get expert advice for your parenting concerns, from real clinicians.
+            </Text>
+          </Animated.View>
 
-        <TouchableOpacity
-          style={styles.historyButton}
-          onPress={() => setShowHistory(true)}
-        >
-          <Text style={styles.historyButtonText}>🕒 See previous messages</Text>
-        </TouchableOpacity>
+          <View style={styles.historyButtonContainer}>
+            <TouchableOpacity
+              style={styles.historyButton}
+              onPress={() => setShowHistory(true)}
+            >
+              <Text style={styles.historyButtonText}>🕒 See previous messages</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
 
         <View style={styles.footer}>
           <TouchableOpacity style={styles.button} onPress={handleGetStarted}>
             <Text style={styles.buttonText}>Get Started →</Text>
           </TouchableOpacity>
         </View>
-      </ScrollView>
+      </View>
     </MainLayout>
   );
 }
@@ -134,9 +138,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background, // Cream
   },
+  wrapper: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
   content: {
     padding: 24,
-    paddingBottom: 40,
+    paddingBottom: 20,
+    flexGrow: 1,
   },
   header: {
     marginBottom: 40,
@@ -153,58 +164,10 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     lineHeight: 26,
   },
-  section: {
-    marginBottom: 40,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    marginBottom: 20,
-  },
-  optionCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.white,
-    borderRadius: 24, // More rounded
-    padding: 24,
-    marginBottom: 16,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 2,
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.02)',
-  },
-  iconPlaceholder: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: colors.systemBubble, // Lavender
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 16,
-  },
-  iconText: {
-    fontSize: 24,
-  },
-  optionTextContainer: {
-    flex: 1,
-  },
-  optionTitle: {
-    fontSize: 18,
-    fontWeight: '700', // Bolder
-    color: colors.textPrimary,
-    marginBottom: 4,
-  },
-  optionDesc: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    lineHeight: 20,
-  },
   footer: {
-    marginTop: 'auto',
+    padding: 24,
+    paddingBottom: 24, // Add padding for bottom spacing
+    backgroundColor: colors.background, // Match background to cover scroll content
   },
   button: {
     backgroundColor: colors.primaryAction, // Salmon
@@ -223,7 +186,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   historyButton: {
-    alignSelf: 'center',
     backgroundColor: 'rgba(0,0,0,0.03)',
     paddingHorizontal: 16,
     paddingVertical: 10,
@@ -313,5 +275,11 @@ const styles = StyleSheet.create({
   historyText: {
     fontSize: 14,
     color: colors.textPrimary,
+  },
+  historyButtonContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingBottom: 40, // Visual balance
   },
 });
