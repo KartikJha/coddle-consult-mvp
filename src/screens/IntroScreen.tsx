@@ -16,11 +16,11 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 type IntroScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Intro'>;
 
 // Message type for history rendering (matching ChatSession structure inner type)
-type Message = {
-  id: string;
-  text: string;
-  sender: 'user' | 'system' | 'clinician';
-};
+// type Message = {
+//   id: string;
+//   text: string;
+//   sender: 'user' | 'system' | 'clinician';
+// };
 
 export default function IntroScreen() {
   const navigation = useNavigation<IntroScreenNavigationProp>();
