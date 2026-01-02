@@ -1,6 +1,6 @@
 # Coddle Consult Expert MVP
 
-This project is a React Native (Expo) implementation of the Coddle "Consult Expert" feature MVP. It demonstrates a multi-step user flow, mock payment logic, and a simulated chat state machine, enhanced with delightful UX patterns.
+A React Native (Expo) MVP demonstrating the "Consult Expert" feature for Coddle. This project showcases a seamless user flow, polished UX/UI, and a simulated expert consultation experience.
 
 ## Setup
 
@@ -13,30 +13,38 @@ This project is a React Native (Expo) implementation of the Coddle "Consult Expe
     npx expo start
     ```
 
-## Architecture & UX
+## Architecture Decisions
 
-*   **Global Layout**: `MainLayout` provides a consistent header (with child profile) and bottom navigation (persistent across screens).
-*   **Navigation**:
-    *   `react-navigation` handles the screen stack `Home` -> `Intro` -> `Concern` -> `Provider` -> `Chat` -> `Completion`.
-    *   `Home` is the entry point, featuring a "Consult" FAB.
-    *   `Intro` serves as the gateway to the consult flow and access to chat history.
-*   **State**: `ConsultContext` persists user choices and `chatHistory`.
-*   **Animations**:
-    *   `Animated` API for entrance, scale, and fade effects.
-    *   `LayoutAnimation` for smooth UI layout changes (error messages, input state).
-*   **Haptics**: `expo-haptics` provides tactile feedback for interactions.
+The architecture was chosen to balance speed of development with a premium, "native" feel that mimics the main Coddle application.
 
-## Key Features
+*   **Global Layout Pattern (`MainLayout`)**:
+    *   **Decision**: Wrap all consult screens in a persistent layout component rather than using individual headers.
+    *   **Why**: To simulate the stability of a tabbed application where the header and bottom navigation remain static while content changes. This simplifies integration into the main app later.
+*   **Context-Based State (`ConsultContext`)**:
+    *   **Decision**: Use React Context for state management (`concern`, `supportType`, `history`).
+    *   **Why**: Redux or MobX would be overkill for this MVP. Context provides sufficient global access for the consult flow and effortless data passing between the Chat and Provider screens.
+*   **Intro Screen as Gateway**:
+    *   **Decision**: Use an `IntroScreen` as the hub for both starting new consults and viewing history.
+    *   **Why**: It segregates the consult flow from the main "Home" feed, providing a dedicated landing space for the feature.
 
--   **Global Navigation**: Enhanced navigation with a persistent bottom bar and a custom header across the consult flow.
--   **Chat History**: View the last 5 completed chat sessions in a read-only modal (accessible from `Intro` screen).
--   **Mock Payment**: Simulated secure payment flow with locking animation and status text.
--   **Chat Simulation**: 4-state machine with realistic typing indicators and message entrance animations.
--   **Interactive UI**: Cards and buttons respond to touch with scale animations and haptics.
--   **Progress Tracking**: Visual progress bar on multi-step forms.
+## Trade-offs & technical constraints
 
-## Future Improvements
+*   **In-Memory Persistence**:
+    *   **Trade-off**: Chat history is stored in React State (memory).
+    *   **Impact**: Refreshing the app clears history.
+    *   **Reason**: sufficient for MVP demonstration without setting up `AsyncStorage` or a database.
+*   **Mocked Backend**:
+    *   **Trade-off**: Chat responses and payments are simulated with `setTimeout`.
+    *   **Impact**: No real network requests are made.
+    *   **Reason**: fast front-end iteration; dependent on backend availability.
+*   **UI-Driven Navigation**:
+    *   **Trade-off**: The "Home" screen is a simulation.
+    *   **Impact**: The bottom navigation tabs (except "AI Assistant") are visual placeholders.
+    *   **Reason**: focus strictly on the Consult flow user journey.
 
-*   **Real Backend**: Connect to a socket/API for real-time chat.
-*   **Persistence**: Use `AsyncStorage` to save chat history permanently.
-*   **Dark Mode**: Add full dark mode support.
+## What I'd Build Next
+
+1.  **Real-Time Chat Integration**: Replace the state machine with a WebSocket/Socket.io connection to the real Coddle backend.
+2.  **Persistent Storage**: Implement `AsyncStorage` or `SQLite` to cache chat history locally so it survives app restarts.
+3.  **Deep Linking**: Support deep links (e.g., `coddle://consult/video`) to open the app directly to specific consult types.
+4.  **Dark Mode Support**: Extend the `theme/colors.ts` system to support a system-wide dark theme.
